@@ -1,6 +1,6 @@
 import os
 import psycopg2
-import shutil  # Dùng để xóa toàn bộ thư mục
+import shutil  
 
 # Kết nối đến PostgreSQL
 def connect_db():
@@ -9,7 +9,7 @@ def connect_db():
             dbname="face_attendance",
             user="postgres",
             password="quang",
-            host="localhost",  # Nếu chạy trên máy local
+            host="localhost",  
             port="5432"
         )
         return conn
