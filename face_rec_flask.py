@@ -53,12 +53,12 @@ def insert_attendance(employee_id):
             (employee_id, name, datetime.now())
         )
         conn.commit()
-        print(f"✅ Đã chấm công cho {name} lúc {datetime.now()}")
+        print(f"Đã chấm công cho {name} lúc {datetime.now()}")
 
         cur.close()
         conn.close()
     except Exception as e:
-        print("❌ Lỗi khi ghi dữ liệu chấm công:", str(e))
+        print("Lỗi khi ghi dữ liệu chấm công:", str(e))
 
 MINSIZE = 20
 THRESHOLD = [0.6, 0.7, 0.7]
