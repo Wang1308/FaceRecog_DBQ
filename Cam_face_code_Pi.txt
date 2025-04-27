@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+import cv2
+import requests
+import base64
+import time
+from lcd import drivers 
+from time import sleep
+
+display = drivers.Lcd()
+
+def capture_and_send():
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        print("Khong mo duoc camera")
+        display.lcd_clear()
+        display.lcd_display_string("Khong mo duoc".center(16), 1)
+        display.lcd_display_string("Camera".center(16),2)
+        return
+
+    try:
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                print("Khong chup duoc anh")
+                continue
+
+            frame = cv2.resize(frame, (640, 480))
+
+            
+            _, buffer = cv2.imencode('.jpg', frame)
+            jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+
+            payload = {
+                'image': jpg_as_text,
+                'w': frame.shape[1],
+                'h': frame.shape[0]
+            }
+
+            try:
+                url = 'http://192.168.0.100:8000/recog'  
+                with requests.post(url, data=payload, timeout=5) as response:
+                    name = response.text.strip()
+
+                if name != "Unknown":
+                    print("Nhan dien:", name)
+                    display.lcd_clear()
+                    display.lcd_display_string("Nhan dien:", 1)
+                    display.lcd_display_string(name.center(16), 2)
+                else:
+                    print("?Khong nhan dien duoc")
+                    display.lcd_clear()
+                    display.lcd_display_string("Khong nhan dien".center(16), 1)
+                    display.lcd_display_string("nguoi!".center(16), 2)
+
+            except Exception as e:
+                print("Loi gui anh:", e)
+                display.lcd_clear()
+                display.lcd_display_string("Loi ket noi".center(16), 1)
+
+            time.sleep(5)
+
+    except KeyboardInterrupt:
+        print("\nDung chuong trinh (Ctrl+C)")
+
+    finally:
+        cap.release()
+        display.lcd_clear()
+
+capture_and_send()
